@@ -12,12 +12,15 @@ public class SolarSystem
 
     [JsonPropertyName("planetaryData")]
     public SolarSystemPlanetaryData? PlanetaryData { get; set; }
+
+    [JsonPropertyName("systemRechargeTime")]
+    public SystemRechargeTime? RechargeTime { get; set; }
     
     [JsonPropertyName("spectralClassifications")]
-    public IEnumerable<SpectralClassification>? SpectralClassifications { get; set; }
+    public List<SpectralClassification>? SpectralClassifications { get; set; }
 
     [JsonPropertyName("rechargeStations")]
-    public IEnumerable<RechargeStationType>? RechargeStations { get; set; }
+    public List<RechargeStationType>? RechargeStations { get; set; }
     
     [JsonPropertyName("wikiUrl")]
     public string? WikiUrl { get; set; }

@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace KaydenMiller.BattleTech.Core;
@@ -7,10 +6,10 @@ namespace KaydenMiller.BattleTech.Core;
 public struct SolarSystemPlanetaryData
 {
     [JsonPropertyName("planets")] 
-    public uint Planets { get; init; } = 0;
+    public uint Planets { get; set; } = 0;
 
     [JsonPropertyName("artificialStructures")]
-    public uint ArtificialStructures { get; init; } = 0;
+    public uint ArtificialStructures { get; set; } = 0;
 
     public SolarSystemPlanetaryData(uint planets, uint artificialStructures)
     {

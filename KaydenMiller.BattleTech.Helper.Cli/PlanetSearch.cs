@@ -180,10 +180,21 @@ public static class PlanetSearch
             coordinates = GalacticCoordinates.Create(0f, 0f, false);
         }
 
+        SystemRechargeTime? rechargeTime;
+        try
+        {
+            rechargeTime = SystemRechargeTime.Parse(systemInformation.GetValue("Recharge time"));
+        }
+        catch
+        {
+            rechargeTime = null;
+        }
+
         return new SolarSystem()
         {
             Name = systemInformation.GetValueOrDefault("SystemName") ?? "UNKNOWN",
             Coordinates = coordinates,
+            RechargeTime = rechargeTime,
             PlanetaryData = SolarSystemPlanetaryData.Parse(systemInformation.GetValueOrDefault("Planet(s)") ?? ""),
             SpectralClassifications = spectralClassifications,
             RechargeStations = rechargeStations,

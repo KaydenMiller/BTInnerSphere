@@ -16,6 +16,8 @@ public class SpectralClassificationTests
     [InlineData("O9VIII", SpectralClass.O, 9, "VIII")]
     [InlineData("O9Ia", SpectralClass.O, 9, "Ia")]
     [InlineData("O9Ib", SpectralClass.O, 9, "Ib")]
+    [InlineData("K8", SpectralClass.K, 8, "")]
+    [InlineData("G", SpectralClass.G, 0, "")]
     public void Should_ParseFromString_WhenStandardInput(string input, SpectralClass spectralClass, uint temp, string lumin)
     {
         var actual = SpectralClassification.Parse(input);

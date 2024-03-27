@@ -7,11 +7,11 @@ namespace KaydenMiller.BattleTech.Core;
 public struct GalacticCoordinates
 {
     [JsonPropertyName("x")] 
-    public float X { get; init; } = 0f;
+    public float X { get; set; } = 0f;
     [JsonPropertyName("y")]
-    public float Y { get; init; } = 0f;
+    public float Y { get; set; } = 0f;
     [JsonPropertyName("areKnown")] 
-    public bool AreKnown { get; init; } = true;
+    public bool AreKnown { get; set; } = true;
 
     private GalacticCoordinates(float x, float y, bool areKnown)
     {
