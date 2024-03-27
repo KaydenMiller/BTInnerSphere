@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KaydenMiller.BattleTech.Api", "KaydenMiller.BattleTech.Api\KaydenMiller.BattleTech.Api.csproj", "{08D69701-6072-4CC2-9E16-7138D908E8D9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KaydenMiller.BattleTech.Helper.Cli", "KaydenMiller.BattleTech.Helper.Cli\KaydenMiller.BattleTech.Helper.Cli.csproj", "{1B2BAD2B-C727-4A83-9F7C-6C7E30119CD1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KaydenMiller.BattleTech.Core", "KaydenMiller.BattleTech.Core\KaydenMiller.BattleTech.Core.csproj", "{7750E552-8BB3-43AE-BB23-23021065A8DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KaydenMiller.BattleTech.Core.Tests.Unit", "KaydenMiller.BattleTech.Core.Tests.Unit\KaydenMiller.BattleTech.Core.Tests.Unit.csproj", "{C6DA8C53-9676-4D02-8A1A-4C282FF654F9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{08D69701-6072-4CC2-9E16-7138D908E8D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08D69701-6072-4CC2-9E16-7138D908E8D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08D69701-6072-4CC2-9E16-7138D908E8D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08D69701-6072-4CC2-9E16-7138D908E8D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B2BAD2B-C727-4A83-9F7C-6C7E30119CD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B2BAD2B-C727-4A83-9F7C-6C7E30119CD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B2BAD2B-C727-4A83-9F7C-6C7E30119CD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B2BAD2B-C727-4A83-9F7C-6C7E30119CD1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7750E552-8BB3-43AE-BB23-23021065A8DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7750E552-8BB3-43AE-BB23-23021065A8DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7750E552-8BB3-43AE-BB23-23021065A8DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7750E552-8BB3-43AE-BB23-23021065A8DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6DA8C53-9676-4D02-8A1A-4C282FF654F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6DA8C53-9676-4D02-8A1A-4C282FF654F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6DA8C53-9676-4D02-8A1A-4C282FF654F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6DA8C53-9676-4D02-8A1A-4C282FF654F9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
