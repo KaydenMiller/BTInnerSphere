@@ -10,11 +10,11 @@ public class SolarSystem
     [JsonPropertyName("coordinates")]
     public required GalacticCoordinates Coordinates { get; set; }
 
-    [JsonPropertyName("planets")]
-    public uint? PlanetCount { get; set; }
+    [JsonPropertyName("planetaryData")]
+    public SolarSystemPlanetaryData? PlanetaryData { get; set; }
     
-    [JsonPropertyName("spectralClass")]
-    public SpectralClass? SpectralClass { get; set; }
+    [JsonPropertyName("spectralClassifications")]
+    public IEnumerable<SpectralClassification>? SpectralClassifications { get; set; }
 
     [JsonPropertyName("rechargeStations")]
     public IEnumerable<RechargeStationType>? RechargeStations { get; set; }

@@ -6,12 +6,12 @@ namespace KaydenMiller.BattleTech.Core;
 
 public struct GalacticCoordinates
 {
-    [JsonPropertyName("x")]
-    public readonly float X = 0f;
+    [JsonPropertyName("x")] 
+    public float X { get; init; } = 0f;
     [JsonPropertyName("y")]
-    public readonly float Y = 0f;
-    [JsonPropertyName("areKnown")]
-    public readonly bool AreKnown = true;
+    public float Y { get; init; } = 0f;
+    [JsonPropertyName("areKnown")] 
+    public bool AreKnown { get; init; } = true;
 
     private GalacticCoordinates(float x, float y, bool areKnown)
     {
@@ -28,12 +28,12 @@ public struct GalacticCoordinates
     public static GalacticCoordinates Parse(string coords)
     {
         var regex = new Regex(@"(-?\d+\.?\d*).*?:.*?(-?\d+\.?\d*)");
-        
+
         if (string.IsNullOrWhiteSpace(coords.Trim()))
         {
             return new GalacticCoordinates(0f, 0f, false);
         }
-        
+
         var groups = regex.Match(coords.Trim()).Groups;
         var x = float.Parse(groups[1].Value);
         var y = float.Parse(groups[2].Value);

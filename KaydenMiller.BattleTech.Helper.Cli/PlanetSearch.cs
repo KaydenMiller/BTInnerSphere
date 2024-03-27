@@ -61,7 +61,7 @@ public static class PlanetSearch
         return systems.DistinctBy(s => s.SystemHref).ToList();
     }
 
-    public static async Task<SolarSystem> SearchSolarSystem(this IPage page, System system)
+    public static async Task<Dictionary<string, string>> SearchSolarSystem(this IPage page, System system)
     {
         Console.WriteLine($"Open Page for System '{system.Name}'");
         var useSystemNameFromInput = false;
@@ -122,14 +122,37 @@ public static class PlanetSearch
             systemInformation.TryAdd(key, value);
         }
 
-        SpectralClass spectralClass;
+        var solarSystemName = !useSystemNameFromInput ? systemHeaders[0].Trim() : system.Name;
+        systemInformation.TryAdd("SystemName", solarSystemName);
+        systemInformation.TryAdd("SystemWikiUrl", wikiUrl);
+
+        return systemInformation;
+    }
+
+    public static SolarSystem ParseFromDictionary(Dictionary<string, string> systemInformation)
+    {
+        List<SpectralClassification> spectralClassifications = [];
         try
         {
-            spectralClass = Enum.Parse<SpectralClass>(systemInformation.GetValue("Spectral class"));
+            var value = systemInformation.GetValue("Spectral class");
+
+            if (value.Contains(','))
+            {
+                // multiple stars and classifications
+                var stars = value.Split(",");
+                var starClassifications = stars
+                    .Select(s => s.Trim())
+                    .Select(SpectralClassification.Parse);
+                spectralClassifications.AddRange(starClassifications);
+            }
+            else
+            {
+                spectralClassifications.Add(SpectralClassification.Parse(value.Trim()));
+            }
         }
         catch
         {
-            spectralClass = SpectralClass.Unknown;
+            spectralClassifications.Add(SpectralClassification.Unknown());
         }
 
         List<RechargeStationType> rechargeStations = [];
@@ -159,13 +182,13 @@ public static class PlanetSearch
 
         return new SolarSystem()
         {
-            Name = !useSystemNameFromInput ? systemHeaders[0].Trim() : system.Name,
+            Name = systemInformation.GetValueOrDefault("SystemName") ?? "UNKNOWN",
             Coordinates = coordinates,
-            PlanetCount = uint.Parse(systemInformation.GetValueOrDefault("Planet(s)") ?? "0"),
-            SpectralClass = spectralClass,
+            PlanetaryData = SolarSystemPlanetaryData.Parse(systemInformation.GetValueOrDefault("Planet(s)") ?? ""),
+            SpectralClassifications = spectralClassifications,
             RechargeStations = rechargeStations,
-            WikiUrl = wikiUrl,
+            WikiUrl = systemInformation.GetValueOrDefault("SystemWikiUrl"),
             Metadata = systemInformation
-        };
+        }; 
     }
 }
