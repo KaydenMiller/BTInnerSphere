@@ -1,0 +1,59 @@
+﻿@page "/"
+@using KaydenMiller.BattleTech.Core
+@using Excubo.Blazor.Canvas
+@inject SolarSystemsService SolarSystemsService
+
+<PageTitle>Counter</PageTitle>
+
+@if (SolarSystems.Any())
+{
+    <div style="max-height: 100%; max-width: 100%; overflow: scroll;">
+        <Canvas @ref="HelperCanvas" width="@CANVAS_WIDTH" height="@CANVAS_HEIGHT"></Canvas>
+    </div>
+}
+
+@code {
+    private Canvas? HelperCanvas;
+    private const int CANVAS_WIDTH = 10_000;
+    private const int CANVAS_HEIGHT = 10_000;
+    private const float SCALE = 3f;
+
+    public List<SolarSystem> SolarSystems { get; set; } = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        SolarSystems = await SolarSystemsService.GetSolarSystems();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (HelperCanvas is not null && SolarSystems.Any())
+        {
+            var halfCanvasWidth = CANVAS_WIDTH / 2f;
+            var halfCanvasHeight = CANVAS_HEIGHT / 2f;
+            var maxHeight = SolarSystems.Max(x => x.Coordinates.Y * SCALE + halfCanvasHeight);
+            var maxWidth = SolarSystems.Max(x => x.Coordinates.X * SCALE + halfCanvasWidth);
+            
+            await using var ctx = await HelperCanvas.GetContext2DAsync();
+            await using (var batch = ctx.CreateBatch())
+            {
+                await batch.FillStyleAsync("black");
+                await batch.FillRectAsync(
+                    halfCanvasWidth - maxWidth / 2f, 
+                    halfCanvasHeight - maxHeight / 2f,
+                    maxWidth,
+                    maxHeight);
+                
+                foreach (var system in SolarSystems.Where(s => s.Coordinates.AreKnown))
+                {
+                    await batch.CreatePlanet(
+                        (int)(system.Coordinates.X * SCALE + CANVAS_WIDTH / 2f),
+                        (int)(-system.Coordinates.Y * SCALE + CANVAS_HEIGHT / 2f),
+                        system.Name,
+                        SpectralClassification.GetColor(system.SpectralClassifications?.First()) 
+                    );
+                }
+            }
+        }
+    }
+}

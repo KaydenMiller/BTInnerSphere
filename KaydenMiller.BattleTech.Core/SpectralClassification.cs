@@ -55,4 +55,19 @@ public class SpectralClassification
     {
         return new SpectralClassification(SpectralClass.Unknown, 0, "UNKNOWN");
     }
+
+    public static string GetColor(SpectralClassification? classification)
+    {
+        return classification?.SpectralClass switch
+        {
+            SpectralClass.O => "#92B5FF", // blue
+            SpectralClass.B => "#A2C0FF", // deep bluish white
+            SpectralClass.A => "#D5E0FF", // bluish white
+            SpectralClass.F => "#F9F5FF", // white
+            SpectralClass.G => "#FFEDE3", // yellowish white
+            SpectralClass.K => "#FFDAB5", // pale yellowish white
+            SpectralClass.M => "#FFB56C", // light orangish red
+            _ => "#F9F5FF"
+        };
+    }
 }
