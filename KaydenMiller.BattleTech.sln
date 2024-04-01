@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KaydenMiller.BattleTech.Cor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KaydenMiller.BattleTech.InnerSphereMap.Web", "KaydenMiller.BattleTech.InnerSphereMap.Web\KaydenMiller.BattleTech.InnerSphereMap.Web.csproj", "{2E75D478-6701-4C8B-8FDC-2FAF255D5C8A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KaydenMiller.BattleTech.Helper.Cli.Test.Unit", "KaydenMiller.BattleTech.Helper.Cli.Test.Unit\KaydenMiller.BattleTech.Helper.Cli.Test.Unit.csproj", "{D7C20112-245B-404D-8CCB-52476C28BD4F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{2E75D478-6701-4C8B-8FDC-2FAF255D5C8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E75D478-6701-4C8B-8FDC-2FAF255D5C8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E75D478-6701-4C8B-8FDC-2FAF255D5C8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7C20112-245B-404D-8CCB-52476C28BD4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7C20112-245B-404D-8CCB-52476C28BD4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7C20112-245B-404D-8CCB-52476C28BD4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7C20112-245B-404D-8CCB-52476C28BD4F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

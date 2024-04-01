@@ -1,11 +1,13 @@
 ﻿using System.Text.RegularExpressions;
 using Flurl;
+using Flurl.Http;
+using HtmlAgilityPack;
 using KaydenMiller.BattleTech.Core;
 using Microsoft.Playwright;
 
 namespace KaydenMiller.BattleTech.Helper.Cli;
 
-public static class PlanetSearch
+public static class RemoteProcessAutomation
 {
     public static async Task<List<System>> FindPossibleSystems(this IPage page)
     {
@@ -60,76 +62,57 @@ public static class PlanetSearch
         // TODO: somehow we are getting 3,301 (after distinct) systems out of a total of 3,304
         return systems.DistinctBy(s => s.SystemHref).ToList();
     }
-
-    public static async Task<Dictionary<string, string>> SearchSolarSystem(this IPage page, System system)
+    
+    public static async Task<string> GetSolarSystemHtmlPage(Uri solarSystemUrl)
     {
-        Console.WriteLine($"Open Page for System '{system.Name}'");
-        var useSystemNameFromInput = false;
-        var wikiUrl = Constants.SARNA_WIKI.AppendPathSegment(system.SystemHref);
-        await page.GotoAsync(wikiUrl, new PageGotoOptions()
-        {
-            WaitUntil = WaitUntilState.DOMContentLoaded
-        });
-
-        var locator = page
-           .Locator("""//table[@class="infobox"]""");
-
-        var locatorElementTasks = (await locator.AllAsync())
-           .Select(e => e.InnerHTMLAsync())
-           .ToList();
-
-        if (locatorElementTasks.Any() is false)
-        {
-            useSystemNameFromInput = true;
-        }
-
-        Console.WriteLine("Collect tables for system");
-        var systemTable = "";
-
-        var elements = await Task.WhenAll(locatorElementTasks);
-
-        if (elements.Any(e => e.Contains("System Information")))
-        {
-            systemTable = elements.Single(e => e.Contains("System Information"));
-        }
-        else
-        {
-            // no system information was found likely just the name of the system
-            useSystemNameFromInput = true;
-        }
-
-        Console.WriteLine("Collect System Headers");
-        var systemHeadersRegex = new Regex("""<tr>\W*<th.*?>(.*?)</th>\W*</tr>""");
-        var systemHeaders = new List<string>();
-        var systemHeaderMatches = systemHeadersRegex.Matches(systemTable);
-        foreach (Match systemHeaderMatch in systemHeaderMatches)
-        {
-            var key = systemHeaderMatch.Groups[1].Value;
-            systemHeaders.Add(key);
-        }
-
-
-        Console.WriteLine("Collect System Information");
-        var systemInformationRegex = new Regex("""<tr>\W*<th.*?>(.*?)</th>\W*<td.*?>(.*?)(<sup.*?)?</td>\W*</tr>""");
-        var systemInformationTableHtml = Regex.Match(systemTable, "System Information</th>(.*)").Groups[1].Value;
-        var systemInformation = new Dictionary<string, string>();
-        var systemInformationMatches = systemInformationRegex.Matches(systemInformationTableHtml);
-        foreach (Match systemInfoMatch in systemInformationMatches)
-        {
-            var key = systemInfoMatch.Groups[1].Value;
-            var value = systemInfoMatch.Groups[2].Value;
-
-            systemInformation.TryAdd(key, value);
-        }
-
-        var solarSystemName = !useSystemNameFromInput ? systemHeaders[0].Trim() : system.Name;
-        systemInformation.TryAdd("SystemName", solarSystemName);
-        systemInformation.TryAdd("SystemWikiUrl", wikiUrl);
-
-        return systemInformation;
+        var page = await solarSystemUrl.GetStringAsync();
+        return page;
+    }
+    
+    private static HtmlDocument GetHtmlDocument(string html)
+    {
+        var htmlDocument = new HtmlDocument();
+        htmlDocument.LoadHtml(html);
+        return htmlDocument;
     }
 
-    public static SolarSystem ParseFromDictionary(Dictionary<string, string> systemInformation)
+    public static List<Infobox> FindInfoBoxes(string htmlPage)
+    {
+        var document = GetHtmlDocument(htmlPage).DocumentNode;
+        var nodes = document.SelectNodes("""//table[contains(@class, "infobox")]""");
+
+        if (nodes is null || nodes.Count == 0)
+        {
+            return [];
+        }
+        
+        var infoBoxElementsHtml = nodes
+           .Select(e => e.InnerHtml)
+           .ToList();
+        var infoBoxElementsText = nodes
+           .Select(e => e.InnerText)
+           .ToList();
+
+
+        List<Infobox> infoboxes = [];
+        for (var boxNumber = 0; boxNumber < infoBoxElementsHtml.Count; boxNumber++)
+        {
+            infoboxes.Add(new Infobox(infoBoxElementsHtml[boxNumber], infoBoxElementsText[boxNumber]));
+        }
+        return infoboxes;
+    }
+    
+    public static string FindPrimaryHeading(string htmlPage)
+    {
+        var document = GetHtmlDocument(htmlPage);
+        var locator = document.DocumentNode.SelectSingleNode("//h1[@id=\"firstHeading\"]");
+        var heading = locator.InnerText.Trim();
+        return heading;
+    }
+    
+    public static SolarSystem ParseFromDictionary(
+        Dictionary<string, string?> systemInformation,
+        IEnumerable<PoliticalAffiliation> politicalAffiliations)
     {
         List<SpectralClassification> spectralClassifications = [];
         try
@@ -199,7 +182,8 @@ public static class PlanetSearch
             SpectralClassifications = spectralClassifications,
             RechargeStations = rechargeStations,
             WikiUrl = systemInformation.GetValueOrDefault("SystemWikiUrl"),
-            Metadata = systemInformation
+            PoliticalAffiliations = politicalAffiliations.ToList(),
+            Metadata = systemInformation 
         }; 
-    }
+    } 
 }

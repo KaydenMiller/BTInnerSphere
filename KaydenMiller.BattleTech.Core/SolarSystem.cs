@@ -8,7 +8,7 @@ public class SolarSystem
     public required string Name { get; set; }
 
     [JsonPropertyName("coordinates")]
-    public required GalacticCoordinates Coordinates { get; set; }
+    public GalacticCoordinates Coordinates { get; set; }
 
     [JsonPropertyName("planetaryData")]
     public SolarSystemPlanetaryData? PlanetaryData { get; set; }
@@ -21,10 +21,13 @@ public class SolarSystem
 
     [JsonPropertyName("rechargeStations")]
     public List<RechargeStationType>? RechargeStations { get; set; }
+
+    [JsonPropertyName("politicalAffiliations")]
+    public List<PoliticalAffiliation>? PoliticalAffiliations { get; set; }
     
     [JsonPropertyName("wikiUrl")]
     public string? WikiUrl { get; set; }
     
     [JsonPropertyName("metadata")]
-    public Dictionary<string, string>? Metadata { get; set; }
+    public Dictionary<string, string?>? Metadata { get; set; }
 }

@@ -1,6 +1,8 @@
 ﻿// This tool is used to extract information from the www.sarna.net wiki
 
+using System.Collections.Concurrent;
 using System.Text.Json;
+using Flurl;
 using KaydenMiller.BattleTech.Core;
 using KaydenMiller.BattleTech.Helper.Cli;
 using Microsoft.Playwright;
@@ -31,43 +33,55 @@ else
     File.WriteAllText("possible-systems.json", JsonSerializer.Serialize(systems));
 }
 
-var solarSystems = new List<SolarSystem>();
-if (File.Exists("solar-systems.json"))
+var htmlPages = new ConcurrentDictionary<string, string>();
+if (File.Exists("systems-html.json"))
 {
-    Console.WriteLine("UPDATING SOLAR SYSTEMS");
-    var file = File.ReadAllText("solar-systems.json");
-    solarSystems = JsonSerializer.Deserialize<List<SolarSystem>>(file) ?? [];
-
-    List<SolarSystem> systemDetailsList = [];
-    foreach (var solarSystem in solarSystems)
-    {
-        solarSystem.Metadata?.TryAdd("SystemName", solarSystem.Name);
-        solarSystem.Metadata?.TryAdd("SystemWikiUrl", solarSystem.WikiUrl ?? "");
-        var systemDetails = PlanetSearch.ParseFromDictionary(solarSystem.Metadata ?? []);
-        systemDetailsList.Add(systemDetails);
-    }
-    
-    var json = JsonSerializer.Serialize(systemDetailsList, new JsonSerializerOptions()
-    {
-        WriteIndented = true
-    });
-    File.WriteAllText("solar-systems-update.json", json);
-    Console.WriteLine("DONE");
+    var text = File.ReadAllText("systems-html.json");
+    htmlPages = JsonSerializer.Deserialize<ConcurrentDictionary<string, string>>(text);
 }
 else
 {
+    await Parallel.ForEachAsync(systems, async (system, token) =>
+    {
+        if (token.IsCancellationRequested) return;
+        Console.WriteLine($"Pulling page for {system.Name}");
+        var url = Constants.SARNA_WIKI.AppendPathSegment(system.SystemHref).ToUri();
+        var htmlPage = await RemoteProcessAutomation.GetSolarSystemHtmlPage(url);
+        htmlPages.TryAdd(system.SystemHref, htmlPage);
+    });
+    Console.WriteLine($"Pages found so far: {htmlPages.Count}");
+    var htmlJson = JsonSerializer.Serialize(htmlPages);
+    File.WriteAllText("systems-html.json", htmlJson);
+}
+
+Console.WriteLine($"Loaded Pages: {htmlPages!.Count}");
+
+var parsedSystems = new ConcurrentStack<SolarSystem>();
+var countOfErrors = 0;
+Parallel.ForEach(htmlPages, (htmlPage, _) =>
+{
     try
     {
-        foreach (var system in systems)
-        {
-            var systemDetailsDictionary = await page.SearchSolarSystem(system);
-            var systemDetails = PlanetSearch.ParseFromDictionary(systemDetailsDictionary);
-            solarSystems.Add(systemDetails);
-        }
+        // Console.WriteLine($"Parsing Page {htmlPage.Key}");
+        var systemHtml = htmlPage.Value;
+        var systemName = RemoteProcessAutomation.FindPrimaryHeading(systemHtml);
+        var infoBoxes = RemoteProcessAutomation.FindInfoBoxes(systemHtml);
+
+        var politicalAffiliations = BattleTechHtmlParser.FindPoliticalAffiliations(systemHtml);
+        var systemDetails = BattleTechHtmlParser.ParseInfoBox(infoBoxes[0]);
+
+        var system = RemoteProcessAutomation.ParseFromDictionary(systemDetails, politicalAffiliations);
+        parsedSystems.Push(system);
     }
-    finally
+    catch (Exception ex)
     {
-        var json = JsonSerializer.Serialize(solarSystems);
-        File.WriteAllText("solar-systems.json", json);
+        Console.WriteLine($"ERROR: parsing page {htmlPage.Key}");
+        Interlocked.Increment(ref countOfErrors);
     }
-}
+});
+Console.WriteLine($"Systems are parsed, with {countOfErrors} errors");
+
+var systemJson = JsonSerializer.Serialize(parsedSystems);
+File.WriteAllText("solar-systems-2.json", systemJson);
+
+Console.WriteLine("Done!");

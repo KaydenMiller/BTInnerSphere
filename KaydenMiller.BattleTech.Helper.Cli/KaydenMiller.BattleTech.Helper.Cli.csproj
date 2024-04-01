@@ -16,7 +16,9 @@
 
     <ItemGroup>
       <PackageReference Include="Flurl.Http" Version="4.0.2" />
+      <PackageReference Include="HtmlAgilityPack" Version="1.11.60" />
       <PackageReference Include="Microsoft.Playwright" Version="1.42.0" />
+      <PackageReference Include="System.Web.Http.Common" Version="4.0.20126.16343" />
     </ItemGroup>
 
     <ItemGroup>

@@ -33,7 +33,7 @@ public class SpectralClassification
     public static SpectralClassification Parse(string input)
     {
         var normalizedInput = input.Trim();
-        var isValidRegex = new Regex("""^([OBAFGKM])(\d)?(Ia|Ib|IV|VIII|VII|VI|III|II|I|V)?$""");
+        var isValidRegex = new Regex("""^([OBAFGKM])(\d)?(Ia|Ib|IV|VIII|VII|VI|III|II|I|V)?($|\[.*$)""");
 
         if (isValidRegex.IsMatch(normalizedInput) is false)
         {
