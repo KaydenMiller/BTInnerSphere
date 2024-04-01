@@ -27,4 +27,16 @@
       <ProjectReference Include="..\KaydenMiller.BattleTech.Helper.Cli\KaydenMiller.BattleTech.Helper.Cli.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="pages\New_Avalon.html">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="pages\Luyten_68-28.html">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="pages\Ingress.html">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

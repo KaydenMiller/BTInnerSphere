@@ -15,12 +15,6 @@ var chrome = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions(
 
 var page = await chrome.NewPageAsync();
 
-// var s = await page.SearchSolarSystem(new KaydenMiller.BattleTech.Helper.Cli.System()
-// {
-//     Name = "Monument to Man",
-//     SystemHref = "/wiki/Monument%20to%20Man"
-// });
-
 List<KaydenMiller.BattleTech.Helper.Cli.System> systems;
 if (File.Exists("possible-systems.json"))
 {
@@ -68,7 +62,12 @@ Parallel.ForEach(htmlPages, (htmlPage, _) =>
         var infoBoxes = RemoteProcessAutomation.FindInfoBoxes(systemHtml);
 
         var politicalAffiliations = BattleTechHtmlParser.FindPoliticalAffiliations(systemHtml);
-        var systemDetails = BattleTechHtmlParser.ParseInfoBox(infoBoxes[0]);
+
+        Dictionary<string, string?> systemDetails = [];
+        if (infoBoxes.Count >= 1)
+        {
+            systemDetails = BattleTechHtmlParser.ParseInfoBox(infoBoxes[0]);
+        }
 
         var system = RemoteProcessAutomation.ParseFromDictionary(systemDetails, politicalAffiliations);
         parsedSystems.Push(system);
@@ -84,4 +83,8 @@ Console.WriteLine($"Systems are parsed, with {countOfErrors} errors");
 var systemJson = JsonSerializer.Serialize(parsedSystems);
 File.WriteAllText("solar-systems-2.json", systemJson);
 
+// Systems are parsed, with 119 errors 
+// Systems are parsed, with 42 errors - This was because of the hack for the xpath parser in the political data
+// Systems are parsed, with 40 errors - Places with no infotables at all
+// Systems are parsed, with 22 errors - Handle 'pre-' date tag
 Console.WriteLine("Done!");

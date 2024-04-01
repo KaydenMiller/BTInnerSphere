@@ -18,14 +18,16 @@ public class PoliticalAffiliation
 
     [JsonPropertyName("isApproximate")]
     public bool Approximate { get; set; } = false;
+    [JsonPropertyName("includePreviousYears")]
+    public bool IncludesPreviousYears { get; set; }
 
     public static PoliticalAffiliation Parse(string input, string? factionWikiUrl = null)
     {
         var dateSplitter = Regex.Match(input, """^(.*?)\s-\s(.*)$""");
         var dateSection = dateSplitter.Groups[1].Value;
-        var dateSectionMatches = Regex.Match(dateSection, """^(ca\.)?\s*(\d+-?\d*)$""");
+        var dateSectionMatches = Regex.Match(dateSection, """^(ca\.|pre-)?\s*([0-9-–]+)$""");
         var approximateData = dateSectionMatches.Groups[1].Value.Trim(); 
-        var yearData = Regex.Match(dateSectionMatches.Groups[2].Value.Trim(), """^(\d+)-?(\d+)?$""");
+        var yearData = Regex.Match(dateSectionMatches.Groups[2].Value.Trim(), """^(\d+)-?–?(\d+)?$""");
         
         var factionSection = dateSplitter.Groups[2].Value;
         var factionMatches = Regex.Match(factionSection, """^(.*?)(\/.*|$)""");
@@ -45,7 +47,9 @@ public class PoliticalAffiliation
             factions.Add(secondFactionName.Trim());
         }
         
-        var isApproximate = string.IsNullOrEmpty(approximateData) is false;
+        
+        var isApproximate = approximateData.Equals("ca.");
+        var includePreviousYears = approximateData.Equals("pre-");
         var startYear = int.Parse(yearData.Groups[1].Value);
         int? endYear = null;
         if (isApproximate)
@@ -59,6 +63,7 @@ public class PoliticalAffiliation
             ApproximateEndYear = endYear,
             Factions = factions,
             Approximate = isApproximate,
+            IncludesPreviousYears = includePreviousYears,
             FactionWikiUrl = null,
         };
     }

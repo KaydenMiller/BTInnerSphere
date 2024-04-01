@@ -1609,4 +1609,44 @@ public class BattleTechHtmlParserTests
         actual.CountFactions("Clan Wolf").Should().Be(9);
         actual.CountFactions("Rasalhague Dominion").Should().Be(2);
     }
+
+    /// <summary>
+    /// https://www.sarna.net/wiki/New_Avalon
+    /// </summary>
+    [Fact]
+    public void Should_ParseSystemNewAvalon()
+    {
+        var page = File.ReadAllText("./pages/New_Avalon.html");
+
+        var actual = BattleTechHtmlParser.FindPoliticalAffiliations(page);
+
+        actual.Count.Should().Be(30);
+    }
+
+    /// <summary>
+    /// https://sarna.net/wiki/Luyten_68-28
+    /// </summary>
+    [Fact]
+    public void Should_ParseSystemLuyten6828()
+    {
+        var page = File.ReadAllText("./pages/Luyten_68-28.html");
+
+        var actual = BattleTechHtmlParser.FindPoliticalAffiliations(page);
+
+        actual.Count.Should().Be(0); 
+    }
+
+    /// <summary>
+    /// https://www.sarna.net/wiki/Ingress
+    /// </summary>
+    [Fact]
+    public void Should_ParseSystemIngress()
+    {
+        var page = File.ReadAllText("./pages/Ingress.html");
+
+        var actual = BattleTechHtmlParser.FindPoliticalAffiliations(page);
+
+        actual.Count.Should().Be(35);
+        actual.CountFactions("Terran Alliance").Should().Be(1);
+    }
 }

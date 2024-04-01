@@ -105,7 +105,7 @@ public static class RemoteProcessAutomation
     public static string FindPrimaryHeading(string htmlPage)
     {
         var document = GetHtmlDocument(htmlPage);
-        var locator = document.DocumentNode.SelectSingleNode("//h1[@id=\"firstHeading\"]");
+        var locator = document.DocumentNode.SelectSingleNode("""//h1[@id="firstHeading"]""");
         var heading = locator.InnerText.Trim();
         return heading;
     }
