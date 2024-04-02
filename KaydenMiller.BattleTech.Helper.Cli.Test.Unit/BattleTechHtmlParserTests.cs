@@ -1779,4 +1779,17 @@ public class BattleTechHtmlParserTests
 
         actual.Count.Should().Be(20);
     }
+    
+    /// <summary>
+    /// https://www.sarna.net/wiki/Richmond
+    /// </summary>
+    [Fact]
+    public void Should_ParseSystemRichmond()
+    {
+        var page = File.ReadAllText("./pages/Richmond.html");
+
+        var actual = BattleTechHtmlParser.FindPoliticalAffiliations(page);
+
+        actual.Count.Should().Be(26);
+    } 
 }

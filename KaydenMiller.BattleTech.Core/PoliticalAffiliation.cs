@@ -11,22 +11,52 @@ public class PoliticalAffiliation
 
     [JsonPropertyName("approxEndDateOfAffiliation")]
     public DateOnly? ApproximateEndDateOfAffiliation { get; set; }
-    
+
     [JsonPropertyName("factions")]
     public required List<PoliticalAffiliationFaction> Factions { get; set; }
+
     [JsonPropertyName("factionWikiUrl")]
     public required string? FactionWikiUrl { get; set; }
 
     [JsonPropertyName("isApproximate")]
     public bool Approximate { get; set; } = false;
+
     [JsonPropertyName("includePreviousYears")]
     public bool IncludesPreviousYears { get; set; }
 
     public static PoliticalAffiliation Parse(string input, string? factionWikiUrl = null)
     {
-        var dateSplitter = Regex.Match(input, """^(.*\d{4}?)s?\s-?\s?(.*)$""");
+        var inputWithoutReferences = Regex.Replace(input, """\[\d+\]""", "");
+
+        Match dateSplitter;
+        if (Regex.IsMatch(input, """(3062)\s-\s(Draconis Combine \(briefly.*\))"""))
+        {
+            // TODO: BECAUSE THIS ONE IS STUPID
+            return new PoliticalAffiliation
+            {
+                Factions =
+                [
+                    new PoliticalAffiliationFaction()
+                    {
+                        Name = "Draconis Combine",
+                        PercentOfOccupation = 100,
+                        PercentOfOccupationKnown = true
+                    }
+                ],
+                DateOfAffiliation = new DateOnly(3062, 1, 1),
+                Approximate = false,
+                IncludesPreviousYears = false,
+                ApproximateEndDateOfAffiliation = null,
+                FactionWikiUrl = null
+            };
+        }
+        else
+        {
+            dateSplitter = Regex.Match(inputWithoutReferences, """^(.*\d{4}?)s?\s-?\s?(.*)$""");
+        }
+
         var dateSection = dateSplitter.Groups[1].Value.Trim();
-        
+
         DateOnly startDate;
         DateOnly? endDate = null;
         var includePreviousYears = false;
@@ -39,7 +69,7 @@ public class PoliticalAffiliation
         else if (Regex.IsMatch(dateSection, """^\w+,\s\d{4}$"""))
         {
             // It is a gregorian date without the day
-            startDate = DateOnly.ParseExact(dateSection, "MMMM, yyyy"); 
+            startDate = DateOnly.ParseExact(dateSection, "MMMM, yyyy");
         }
         else if (Regex.IsMatch(dateSection, """^mid\-?\s*(\d{4})"""))
         {
@@ -58,15 +88,15 @@ public class PoliticalAffiliation
         else if (Regex.IsMatch(dateSection, """^late\s*(\d{4})"""))
         {
             var startYear = int.Parse(Regex.Match(dateSection, """^late\s*(\d{4})""").Groups[1].Value);
-            startDate = DateOnly.FromDateTime(new DateTime(startYear, 9, 1)); 
+            startDate = DateOnly.FromDateTime(new DateTime(startYear, 9, 1));
         }
         else
         {
             // It is just a year
             var dateSectionMatches = Regex.Match(dateSection, """^(ca\.|pre-)?\s*([0-9-– ]+)$""");
-            var approximateData = dateSectionMatches.Groups[1].Value.Trim(); 
+            var approximateData = dateSectionMatches.Groups[1].Value.Trim();
             var yearData = Regex.Match(dateSectionMatches.Groups[2].Value.Trim(), """^(\d+)\s?-?–?\s?(\d+)?$""");
-            
+
             isApproximate = approximateData.Equals("ca.");
             includePreviousYears = approximateData.Equals("pre-");
             var startYear = int.Parse(yearData.Groups[1].Value);
@@ -117,7 +147,6 @@ public class PoliticalAffiliation
                     factionMatches.Add(groupedFaction);
                 }
             }
-
         }
         else if (factionSection.Value.Contains('/'))
         {
@@ -128,8 +157,8 @@ public class PoliticalAffiliation
         {
             factionMatches = [factionSection.Value];
         }
-        
-        
+
+
         List<PoliticalAffiliationFaction> factions = [];
         var validFactionMatches = factionMatches.ToArray().Select(g => g.Trim());
         foreach (var faction in validFactionMatches)
@@ -149,9 +178,9 @@ public class PoliticalAffiliation
                     {
                         Name = unknownPercentFaction.Groups[1].Value.Trim(),
                         PercentOfOccupation = 0,
-                        PercentOfOccupationKnown = false 
+                        PercentOfOccupationKnown = false
                     };
-                    factions.Add(paFaction);     
+                    factions.Add(paFaction);
                 }
                 else
                 {
@@ -162,7 +191,7 @@ public class PoliticalAffiliation
                         PercentOfOccupation = int.Parse(factionMatch.Groups[2].Value.Trim()),
                         PercentOfOccupationKnown = true
                     };
-                    factions.Add(paFaction);    
+                    factions.Add(paFaction);
                 }
             }
             else
@@ -174,10 +203,9 @@ public class PoliticalAffiliation
                     PercentOfOccupation = 100,
                     PercentOfOccupationKnown = true
                 };
-                factions.Add(paFaction);  
+                factions.Add(paFaction);
             }
         }
-        
 
 
         return new PoliticalAffiliation
