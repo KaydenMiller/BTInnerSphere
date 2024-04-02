@@ -1701,4 +1701,17 @@ public class BattleTechHtmlParserTests
 
         actual.Count.Should().Be(29);
     }
+    
+    /// <summary>
+    /// https://www.sarna.net/wiki/Rochelle
+    /// </summary>
+    [Fact]
+    public void Should_ParseSystemRochelle()
+    {
+        var page = File.ReadAllText("./pages/Rochelle.html");
+
+        var actual = BattleTechHtmlParser.FindPoliticalAffiliations(page);
+
+        actual.Count.Should().Be(39);
+    }
 }

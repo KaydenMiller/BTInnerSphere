@@ -90,4 +90,5 @@ File.WriteAllText("solar-systems-2.json", systemJson);
 // Systems are parsed, with 27 errors - Handling initial split / tags in political data
 // Systems are parsed, with 12 errors - Handle /, expressions in political data
 // Systems are parsed, with 12 errors - Somehow fix issue with missing - between date and faction and now have new errors
+// Systems are parsed, with 9 errors - support ' ' values between years
 Console.WriteLine("Done!");

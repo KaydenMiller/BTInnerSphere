@@ -48,9 +48,9 @@ public class PoliticalAffiliation
         else
         {
             // It is just a year
-            var dateSectionMatches = Regex.Match(dateSection, """^(ca\.|pre-)?\s*([0-9-–]+)$""");
+            var dateSectionMatches = Regex.Match(dateSection, """^(ca\.|pre-)?\s*([0-9-– ]+)$""");
             var approximateData = dateSectionMatches.Groups[1].Value.Trim(); 
-            var yearData = Regex.Match(dateSectionMatches.Groups[2].Value.Trim(), """^(\d+)-?–?(\d+)?$""");
+            var yearData = Regex.Match(dateSectionMatches.Groups[2].Value.Trim(), """^(\d+)\s?-?–?\s?(\d+)?$""");
             
             isApproximate = approximateData.Equals("ca.");
             includePreviousYears = approximateData.Equals("pre-");
