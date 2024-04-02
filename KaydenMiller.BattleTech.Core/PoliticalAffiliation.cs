@@ -127,7 +127,7 @@ public class PoliticalAffiliation
 
             if (faction.Contains('%'))
             {
-                var factionMatch = Regex.Match(faction, """^([a-zA-Z0-9 \(\)]+).*?(\d\d)%""");
+                var factionMatch = Regex.Match(faction, """^([a-zA-Z0-9 \(\)]+).*?(\d{1,3})\s?%""");
                 var paFaction = new PoliticalAffiliationFaction()
                 {
                     Name = factionMatch.Groups[1].Value.Trim(),

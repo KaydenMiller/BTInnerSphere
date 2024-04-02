@@ -1714,4 +1714,17 @@ public class BattleTechHtmlParserTests
 
         actual.Count.Should().Be(39);
     }
+    
+    /// <summary>
+    /// https://www.sarna.net/wiki/Shadow
+    /// </summary>
+    [Fact]
+    public void Should_ParseSystemShadow()
+    {
+        var page = File.ReadAllText("./pages/Shadow.html");
+
+        var actual = BattleTechHtmlParser.FindPoliticalAffiliations(page);
+
+        actual.Count.Should().Be(13);
+    }
 }
