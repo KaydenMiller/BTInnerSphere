@@ -25,7 +25,7 @@ public class PoliticalAffiliation
     public static PoliticalAffiliation Parse(string input, string? factionWikiUrl = null)
     {
         var dateSplitter = Regex.Match(input, """^(.*\d{4}?)s?\s-?\s?(.*)$""");
-        var dateSection = dateSplitter.Groups[1].Value;
+        var dateSection = dateSplitter.Groups[1].Value.Trim();
         
         DateOnly startDate;
         DateOnly? endDate = null;
@@ -35,6 +35,11 @@ public class PoliticalAffiliation
         {
             // It is a gregorian date
             startDate = DateOnly.ParseExact(dateSection, "dd MMMM, yyyy");
+        }
+        else if (Regex.IsMatch(dateSection, """^\w+,\s\d{4}$"""))
+        {
+            // It is a gregorian date without the day
+            startDate = DateOnly.ParseExact(dateSection, "MMMM, yyyy"); 
         }
         else if (Regex.IsMatch(dateSection, """^mid\-?\s*(\d{4})"""))
         {
@@ -137,13 +142,28 @@ public class PoliticalAffiliation
 
             if (faction.Contains('%'))
             {
-                var factionMatch = Regex.Match(faction, """^([a-zA-Z0-9 \(\)]+).*?(\d{1,3})\s?%""");
-                var paFaction = new PoliticalAffiliationFaction()
+                if (Regex.IsMatch(faction, """^([a-zA-Z0-9 \(\)]+).*?(\?)\s?%"""))
                 {
-                    Name = factionMatch.Groups[1].Value.Trim(),
-                    PercentOfOccupation = int.Parse(factionMatch.Groups[2].Value.Trim())
-                };
-                factions.Add(paFaction);   
+                    var unknownPercentFaction = Regex.Match(faction, """^([a-zA-Z0-9 \(\)]+).*?(\?)\s?%""");
+                    var paFaction = new PoliticalAffiliationFaction()
+                    {
+                        Name = unknownPercentFaction.Groups[1].Value.Trim(),
+                        PercentOfOccupation = 0,
+                        PercentOfOccupationKnown = false 
+                    };
+                    factions.Add(paFaction);     
+                }
+                else
+                {
+                    var factionMatch = Regex.Match(faction, """^([a-zA-Z0-9 \(\)]+).*?(\d{1,3})\s?%""");
+                    var paFaction = new PoliticalAffiliationFaction()
+                    {
+                        Name = factionMatch.Groups[1].Value.Trim(),
+                        PercentOfOccupation = int.Parse(factionMatch.Groups[2].Value.Trim()),
+                        PercentOfOccupationKnown = true
+                    };
+                    factions.Add(paFaction);    
+                }
             }
             else
             {
@@ -151,7 +171,8 @@ public class PoliticalAffiliation
                 var paFaction = new PoliticalAffiliationFaction()
                 {
                     Name = factionName.Trim(),
-                    PercentOfOccupation = 100
+                    PercentOfOccupation = 100,
+                    PercentOfOccupationKnown = true
                 };
                 factions.Add(paFaction);  
             }

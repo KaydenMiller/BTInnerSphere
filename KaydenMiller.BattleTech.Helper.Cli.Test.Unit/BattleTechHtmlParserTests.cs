@@ -1753,4 +1753,30 @@ public class BattleTechHtmlParserTests
 
         actual.Count.Should().Be(31);
     }
+    
+    /// <summary>
+    /// https://www.sarna.net/wiki/Hoard
+    /// </summary>
+    [Fact]
+    public void Should_ParseSystemHoard()
+    {
+        var page = File.ReadAllText("./pages/Hoard.html");
+
+        var actual = BattleTechHtmlParser.FindPoliticalAffiliations(page);
+
+        actual.Count.Should().Be(18);
+    }
+
+    /// <summary>
+    /// https://www.sarna.net/wiki/Roche
+    /// </summary>
+    [Fact]
+    public void Should_ParseSystemRoche()
+    {
+        var page = File.ReadAllText("./pages/Roche.html");
+
+        var actual = BattleTechHtmlParser.FindPoliticalAffiliations(page);
+
+        actual.Count.Should().Be(20);
+    }
 }
