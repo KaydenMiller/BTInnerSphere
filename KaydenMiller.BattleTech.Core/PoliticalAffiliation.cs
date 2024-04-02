@@ -24,7 +24,7 @@ public class PoliticalAffiliation
 
     public static PoliticalAffiliation Parse(string input, string? factionWikiUrl = null)
     {
-        var dateSplitter = Regex.Match(input, """^(.*?)\s-\s(.*)$""");
+        var dateSplitter = Regex.Match(input, """^(.*\d{4}?)\s-?\s?(.*)$""");
         var dateSection = dateSplitter.Groups[1].Value;
         
         DateOnly startDate;

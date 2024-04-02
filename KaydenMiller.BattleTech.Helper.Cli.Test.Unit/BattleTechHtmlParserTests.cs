@@ -1688,4 +1688,17 @@ public class BattleTechHtmlParserTests
         actual.CountFactions("Clan Cloud Cobra").Should().Be(1);
         actual.CountFactions("Clan Star Adder").Should().Be(8);
     }
+    
+    /// <summary>
+    /// https://www.sarna.net/wiki/Chapultepec
+    /// </summary>
+    [Fact]
+    public void Should_ParseSystemChapultepec()
+    {
+        var page = File.ReadAllText("./pages/Chapultepec.html");
+
+        var actual = BattleTechHtmlParser.FindPoliticalAffiliations(page);
+
+        actual.Count.Should().Be(29);
+    }
 }
