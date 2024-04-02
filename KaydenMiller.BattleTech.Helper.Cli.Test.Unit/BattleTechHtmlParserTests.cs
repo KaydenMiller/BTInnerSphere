@@ -1740,4 +1740,17 @@ public class BattleTechHtmlParserTests
 
         actual.Count.Should().Be(27);
     }
+    
+    /// <summary>
+    /// https://www.sarna.net/wiki/New_Hope
+    /// </summary>
+    [Fact]
+    public void Should_ParseSystemNewHope()
+    {
+        var page = File.ReadAllText("./pages/New_Hope.html");
+
+        var actual = BattleTechHtmlParser.FindPoliticalAffiliations(page);
+
+        actual.Count.Should().Be(31);
+    }
 }

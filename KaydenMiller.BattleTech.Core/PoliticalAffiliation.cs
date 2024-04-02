@@ -41,6 +41,11 @@ public class PoliticalAffiliation
             var startYear = int.Parse(Regex.Match(dateSection, """^mid\-?\s*(\d{4})""").Groups[1].Value);
             startDate = DateOnly.FromDateTime(new DateTime(startYear, 6, 1));
         }
+        else if (Regex.IsMatch(dateSection, """^mid-to-late\-?\s*(\d{4})"""))
+        {
+            var startYear = int.Parse(Regex.Match(dateSection, """^mid-to-late\-?\s*(\d{4})""").Groups[1].Value);
+            startDate = DateOnly.FromDateTime(new DateTime(startYear, 6, 1));
+        }
         else if (Regex.IsMatch(dateSection, """^(Oct)\s*\d{4}"""))
         {
             startDate = DateOnly.ParseExact(dateSection, "MMM yyyy");
