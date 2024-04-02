@@ -24,7 +24,7 @@ public class PoliticalAffiliation
 
     public static PoliticalAffiliation Parse(string input, string? factionWikiUrl = null)
     {
-        var dateSplitter = Regex.Match(input, """^(.*\d{4}?)\s-?\s?(.*)$""");
+        var dateSplitter = Regex.Match(input, """^(.*\d{4}?)s?\s-?\s?(.*)$""");
         var dateSection = dateSplitter.Groups[1].Value;
         
         DateOnly startDate;
@@ -36,14 +36,19 @@ public class PoliticalAffiliation
             // It is a gregorian date
             startDate = DateOnly.ParseExact(dateSection, "dd MMMM, yyyy");
         }
-        else if (Regex.IsMatch(dateSection, """^mid\s*(\d{4})"""))
+        else if (Regex.IsMatch(dateSection, """^mid\-?\s*(\d{4})"""))
         {
-            var startYear = int.Parse(Regex.Match(dateSection, """^mid\s*(\d{4})""").Groups[1].Value);
+            var startYear = int.Parse(Regex.Match(dateSection, """^mid\-?\s*(\d{4})""").Groups[1].Value);
             startDate = DateOnly.FromDateTime(new DateTime(startYear, 6, 1));
         }
         else if (Regex.IsMatch(dateSection, """^(Oct)\s*\d{4}"""))
         {
             startDate = DateOnly.ParseExact(dateSection, "MMM yyyy");
+        }
+        else if (Regex.IsMatch(dateSection, """^late\s*(\d{4})"""))
+        {
+            var startYear = int.Parse(Regex.Match(dateSection, """^late\s*(\d{4})""").Groups[1].Value);
+            startDate = DateOnly.FromDateTime(new DateTime(startYear, 9, 1)); 
         }
         else
         {

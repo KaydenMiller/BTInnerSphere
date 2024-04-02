@@ -1727,4 +1727,17 @@ public class BattleTechHtmlParserTests
 
         actual.Count.Should().Be(13);
     }
+    
+    /// <summary>
+    /// https://www.sarna.net/wiki/Rocky
+    /// </summary>
+    [Fact]
+    public void Should_ParseSystemRocky()
+    {
+        var page = File.ReadAllText("./pages/Rocky.html");
+
+        var actual = BattleTechHtmlParser.FindPoliticalAffiliations(page);
+
+        actual.Count.Should().Be(27);
+    }
 }
