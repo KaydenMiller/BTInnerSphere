@@ -71,7 +71,7 @@ public static class BattleTechHtmlParser
 
         var locatorInnerTextElements = nodes 
            .Select(e => WebUtility.HtmlDecode(e.InnerText).Trim())
-           .Where(e => Regex.IsMatch(e, """^\d+|^ca\.|^pre-""")) // TODO: this is a hack to prevent the xpath above from becoming basically a million lines long
+           .Where(e => Regex.IsMatch(e, """^\d+|^ca\.|^pre-|^mid|^Oct""")) // TODO: this is a hack to prevent the xpath above from becoming basically a million lines long
            .Select(e => PoliticalAffiliation.Parse(e))
            .ToList();
         return locatorInnerTextElements;

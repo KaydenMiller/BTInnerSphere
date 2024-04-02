@@ -1,18 +1,19 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Globalization;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace KaydenMiller.BattleTech.Core;
 
 public class PoliticalAffiliation
 {
-    [JsonPropertyName("year")]
-    public required int Year { get; set; }
+    [JsonPropertyName("dateOfAffiliation")]
+    public required DateOnly DateOfAffiliation { get; set; }
 
-    [JsonPropertyName("approxEndYear")]
-    public int? ApproximateEndYear { get; set; }
+    [JsonPropertyName("approxEndDateOfAffiliation")]
+    public DateOnly? ApproximateEndDateOfAffiliation { get; set; }
     
     [JsonPropertyName("factions")]
-    public required List<string> Factions { get; set; }
+    public required List<PoliticalAffiliationFaction> Factions { get; set; }
     [JsonPropertyName("factionWikiUrl")]
     public required string? FactionWikiUrl { get; set; }
 
@@ -25,42 +26,133 @@ public class PoliticalAffiliation
     {
         var dateSplitter = Regex.Match(input, """^(.*?)\s-\s(.*)$""");
         var dateSection = dateSplitter.Groups[1].Value;
-        var dateSectionMatches = Regex.Match(dateSection, """^(ca\.|pre-)?\s*([0-9-–]+)$""");
-        var approximateData = dateSectionMatches.Groups[1].Value.Trim(); 
-        var yearData = Regex.Match(dateSectionMatches.Groups[2].Value.Trim(), """^(\d+)-?–?(\d+)?$""");
         
-        var factionSection = dateSplitter.Groups[2].Value;
-        var factionMatches = Regex.Match(factionSection, """^(.*?)(\/.*|$)""");
-
-        List<string> factions = [];
-        
-        
-        var firstFaction = factionMatches.Groups[1].Value.Replace('/', ' ').Trim();
-        var firstFactionName = Regex.Match(firstFaction, """^([a-zA-Z0-9 \(\)]+)""").Groups[1].Value;
-        factions.Add(firstFactionName.Trim());
-
-        if (string.IsNullOrWhiteSpace(factionMatches.Groups[2].Value) is false)
+        DateOnly startDate;
+        DateOnly? endDate = null;
+        var includePreviousYears = false;
+        var isApproximate = false;
+        if (Regex.IsMatch(dateSection, """^\d{2}\s\w+,\s\d{4}$"""))
         {
-            // There is another faction
-            var secondFaction = factionMatches.Groups[2].Value.Replace('/', ' ').Trim();
-            var secondFactionName = Regex.Match(secondFaction, """^([a-zA-Z0-9 \(\)]+)""").Groups[1].Value;
-            factions.Add(secondFactionName.Trim());
+            // It is a gregorian date
+            startDate = DateOnly.ParseExact(dateSection, "dd MMMM, yyyy");
+        }
+        else if (Regex.IsMatch(dateSection, """^mid\s*(\d{4})"""))
+        {
+            var startYear = int.Parse(Regex.Match(dateSection, """^mid\s*(\d{4})""").Groups[1].Value);
+            startDate = DateOnly.FromDateTime(new DateTime(startYear, 6, 1));
+        }
+        else if (Regex.IsMatch(dateSection, """^(Oct)\s*\d{4}"""))
+        {
+            startDate = DateOnly.ParseExact(dateSection, "MMM yyyy");
+        }
+        else
+        {
+            // It is just a year
+            var dateSectionMatches = Regex.Match(dateSection, """^(ca\.|pre-)?\s*([0-9-–]+)$""");
+            var approximateData = dateSectionMatches.Groups[1].Value.Trim(); 
+            var yearData = Regex.Match(dateSectionMatches.Groups[2].Value.Trim(), """^(\d+)-?–?(\d+)?$""");
+            
+            isApproximate = approximateData.Equals("ca.");
+            includePreviousYears = approximateData.Equals("pre-");
+            var startYear = int.Parse(yearData.Groups[1].Value);
+            if (isApproximate && !string.IsNullOrWhiteSpace(yearData.Groups[2].Value))
+            {
+                var endYear = int.Parse(yearData.Groups[2].Value);
+                endDate = DateOnly.FromDateTime(new DateTime(endYear, 1, 1));
+            }
+
+            startDate = DateOnly.FromDateTime(new DateTime(startYear, 1, 1));
+        }
+
+        List<string> factionMatches = [];
+        var factionSection = dateSplitter.Groups[2];
+        if (factionSection.Value.Contains(','))
+        {
+            var groupedFactionSplits = factionSection.Value.Split(',');
+
+            foreach (var groupedFaction in groupedFactionSplits)
+            {
+                if (groupedFaction.Contains('/'))
+                {
+                    var factionSplit = groupedFaction.Split('/');
+                    if (factionSplit.Any(f => f.Contains('%')))
+                    {
+                        // has percent ownership
+                        var percentFaction = factionSplit.Single(f => f.Contains('%'));
+                        var percent = int.Parse(Regex.Match(percentFaction, """(\d{2})%""").Groups[1].Value);
+
+                        var updatedFactions = factionSplit
+                           .Where(f => !f.Contains('%'))
+                           .Select(f =>
+                            {
+                                f += $" - {percent}%";
+                                return f;
+                            })
+                           .Append(percentFaction)
+                           .ToList();
+                        factionMatches.AddRange(updatedFactions);
+                    }
+                    else
+                    {
+                        factionMatches.AddRange(factionSplit);
+                    }
+                }
+                else
+                {
+                    factionMatches.Add(groupedFaction);
+                }
+            }
+
+        }
+        else if (factionSection.Value.Contains('/'))
+        {
+            var groupedFactionSplits = factionSection.Value.Split('/');
+            factionMatches = groupedFactionSplits.ToList();
+        }
+        else
+        {
+            factionMatches = [factionSection.Value];
         }
         
         
-        var isApproximate = approximateData.Equals("ca.");
-        var includePreviousYears = approximateData.Equals("pre-");
-        var startYear = int.Parse(yearData.Groups[1].Value);
-        int? endYear = null;
-        if (isApproximate)
+        List<PoliticalAffiliationFaction> factions = [];
+        var validFactionMatches = factionMatches.ToArray().Select(g => g.Trim());
+        foreach (var faction in validFactionMatches)
         {
-            endYear = int.Parse(yearData.Groups[2].Value);
+            if (string.IsNullOrWhiteSpace(faction))
+            {
+                // no faction in capture group
+                continue;
+            }
+
+            if (faction.Contains('%'))
+            {
+                var factionMatch = Regex.Match(faction, """^([a-zA-Z0-9 \(\)]+).*?(\d\d)%""");
+                var paFaction = new PoliticalAffiliationFaction()
+                {
+                    Name = factionMatch.Groups[1].Value.Trim(),
+                    PercentOfOccupation = int.Parse(factionMatch.Groups[2].Value.Trim())
+                };
+                factions.Add(paFaction);   
+            }
+            else
+            {
+                var factionName = Regex.Match(faction, """^([a-zA-Z0-9 \(\)]+)""").Groups[1].Value;
+                var paFaction = new PoliticalAffiliationFaction()
+                {
+                    Name = factionName.Trim(),
+                    PercentOfOccupation = 100
+                };
+                factions.Add(paFaction);  
+            }
         }
+        
+
 
         return new PoliticalAffiliation
         {
-            Year = startYear,
-            ApproximateEndYear = endYear,
+            DateOfAffiliation = startDate,
+            ApproximateEndDateOfAffiliation = endDate,
             Factions = factions,
             Approximate = isApproximate,
             IncludesPreviousYears = includePreviousYears,

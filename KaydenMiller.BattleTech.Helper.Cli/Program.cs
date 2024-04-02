@@ -87,4 +87,6 @@ File.WriteAllText("solar-systems-2.json", systemJson);
 // Systems are parsed, with 42 errors - This was because of the hack for the xpath parser in the political data
 // Systems are parsed, with 40 errors - Places with no infotables at all
 // Systems are parsed, with 22 errors - Handle 'pre-' date tag
+// Systems are parsed, with 27 errors - 
+// 
 Console.WriteLine("Done!");

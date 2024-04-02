@@ -13,8 +13,8 @@ public class PoliticalAffiliationTests
         var actual = PoliticalAffiliation.Parse(input);
         var expected = new PoliticalAffiliation()
         {
-            Factions = [faction],
-            Year = year,
+            Factions = [new PoliticalAffiliationFaction() { Name = faction, PercentOfOccupation = 100}],
+            DateOfAffiliation = new DateOnly(year, 1, 1),
             FactionWikiUrl = null
         };
         actual.Should().BeEquivalentTo(expected);
@@ -29,8 +29,8 @@ public class PoliticalAffiliationTests
         var actual = PoliticalAffiliation.Parse(input);
         var expected = new PoliticalAffiliation()
         {
-            Factions = [faction],
-            Year = year,
+            Factions = [new PoliticalAffiliationFaction() { Name = faction, PercentOfOccupation = 100}],
+            DateOfAffiliation = new DateOnly(year, 1, 1),
             FactionWikiUrl = null
         };
         actual.Should().BeEquivalentTo(expected);

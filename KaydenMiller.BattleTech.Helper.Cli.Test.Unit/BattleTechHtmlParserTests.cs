@@ -421,9 +421,9 @@ public class BattleTechHtmlParserTests
         var actual = BattleTechHtmlParser.FindPoliticalAffiliations(page);
 
         actual.Count.Should().Be(26);
-        actual.Where(a => a.Factions.Contains("No record")).Count().Should().Be(18);
-        actual.Count(a => a.Factions.Contains("Capellan Confederation")).Should().Be(7);
-        actual.Count(a => a.Factions.Contains("Independent world")).Should().Be(1);
+        actual.CountFactions("No record").Should().Be(18);
+        actual.CountFactions(("Capellan Confederation")).Should().Be(7);
+        actual.CountFactions(("Independent world")).Should().Be(1);
     }
 
     /// <summary>
@@ -981,20 +981,20 @@ public class BattleTechHtmlParserTests
                       </div>
                    </div>
                    """;
-        
+
         var actual = BattleTechHtmlParser.FindPoliticalAffiliations(page);
 
         actual.Count.Should().Be(25);
-        actual.Count(a => a.Factions.Contains("No record")).Should().Be(1);
-        actual.Count(a => a.Factions.Contains("Lyran Commonwealth")).Should().Be(8);
-        actual.Count(a => a.Factions.Contains("Federated Commonwealth")).Should().Be(1); 
-        actual.Count(a => a.Factions.Contains("Clan Jade Falcon (from August)")).Should().Be(1); 
-        actual.Count(a => a.Factions.Contains("Clan Jade Falcon")).Should().Be(9); 
-        actual.Count(a => a.Factions.Contains("Clan Steel Viper")).Should().Be(2); 
-        actual.Count(a => a.Factions.Contains("Lyran Alliance (from December)")).Should().Be(1); 
-        actual.Count(a => a.Factions.Contains("Lyran Alliance")).Should().Be(1); 
-        actual.Count(a => a.Factions.Contains("Clan Jade Falcon (from February)")).Should().Be(1); 
-        actual.Count(a => a.Factions.Contains("Alyina Mercantile League")).Should().Be(1); 
+        actual.CountFactions(("No record")).Should().Be(1);
+        actual.CountFactions(("Lyran Commonwealth")).Should().Be(8);
+        actual.CountFactions(("Federated Commonwealth")).Should().Be(1);
+        actual.CountFactions(("Clan Jade Falcon (from August)")).Should().Be(1);
+        actual.CountFactions(("Clan Jade Falcon")).Should().Be(9);
+        actual.CountFactions(("Clan Steel Viper")).Should().Be(2);
+        actual.CountFactions(("Lyran Alliance (from December)")).Should().Be(1);
+        actual.CountFactions("Lyran Alliance").Should().Be(1);
+        actual.CountFactions("Clan Jade Falcon (from February)").Should().Be(1);
+        actual.CountFactions("Alyina Mercantile League").Should().Be(1);
     }
 
     /// <summary>
@@ -1633,7 +1633,7 @@ public class BattleTechHtmlParserTests
 
         var actual = BattleTechHtmlParser.FindPoliticalAffiliations(page);
 
-        actual.Count.Should().Be(0); 
+        actual.Count.Should().Be(0);
     }
 
     /// <summary>
@@ -1648,5 +1648,44 @@ public class BattleTechHtmlParserTests
 
         actual.Count.Should().Be(35);
         actual.CountFactions("Terran Alliance").Should().Be(1);
+    }
+
+    /// <summary>
+    /// https://www.sarna.net/wiki/Londerholm
+    /// </summary>
+    [Fact]
+    public void Should_ParseSystemLonderholm()
+    {
+        var page = File.ReadAllText("./pages/Londerholm.html");
+
+        var actual = BattleTechHtmlParser.FindPoliticalAffiliations(page);
+
+        actual.Count.Should().Be(10);
+        actual.CountFactions("The Clans").Should().Be(1);
+        actual.CountFactions("Clan Smoke Jaguar").Should().Be(4);
+        actual.CountFactions("Clan Coyote").Should().Be(5);
+        actual.CountFactions("Clan Ice Hellion").Should().Be(4);
+        actual.CountFactions("Clan Nova Cat").Should().Be(1);
+        actual.CountFactions("Clan Stone Lion").Should().Be(1);
+    }
+
+    /// <summary>
+    /// https://www.sarna.net/wiki/Tathis
+    /// </summary>
+    [Fact]
+    public void Should_ParseSystemTathis()
+    {
+        var page = File.ReadAllText("./pages/Tathis.html");
+
+        var actual = BattleTechHtmlParser.FindPoliticalAffiliations(page);
+
+        actual.Count.Should().Be(9);
+        actual.CountFactions("Clan Mongoose").Should().Be(1);
+        actual.CountFactions("Clan Diamond Shark").Should().Be(5);
+        actual.CountFactions("Clan Ice Hellion").Should().Be(4);
+        actual.CountFactions("Clan Coyote").Should().Be(2);
+        actual.CountFactions("Clan Ice Hellion (Abandoned)").Should().Be(1);
+        actual.CountFactions("Clan Cloud Cobra").Should().Be(1);
+        actual.CountFactions("Clan Star Adder").Should().Be(8);
     }
 }
